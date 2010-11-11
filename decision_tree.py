@@ -1,6 +1,7 @@
 #!/usr/bin/evn python
 
 import sys
+import data
 		
 def main():
 	"""Starts program"""
