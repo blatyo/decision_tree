@@ -3,10 +3,13 @@ import tree
 import csv
 
 class Analyzer:
-	def __init__(self, file_name):
+	def __init__(self, file_name, prune=False):
 		self.samples = data.Samples(file_name)
 		self.builder = tree.Builder()
 		self.file_name = file_name.split('/')[-1]
+		self.prune = prune
+		if prune:
+			print "With pruning!"
 	
 	def analyze(self):
 		"""calculates averages for correctly classified and node count"""
@@ -21,7 +24,7 @@ class Analyzer:
 		step = self.step(length)
 		
 		"""calculate averages"""
-		counts, node_counts, averages, average_nodes = {}, {}, {}, {}
+		counts, node_counts, averages, average_nodes, total = {}, {}, {}, {}, 0
 		for i in step:
 			print i
 			for sample in samples:
@@ -30,21 +33,28 @@ class Analyzer:
 				if not node_counts.get(i):
 					node_counts[i] = 0
 				(tr, te) = sample
-				tree = self.builder.build(tr[0:i])
+				tree = self.builder.build(tr[0:i], self.samples.attributes(), self.prune)
 				counts[i] += self.test(tree, te)
 				node_counts[i] += tree.number_of_nodes()
-			averages[i] = counts[i] / float(len(samples))
+				total = len(te)
+			averages[i] = counts[i] / float(len(samples) * total)
 			average_nodes[i] = node_counts[i] / float(len(samples))
 			
 			self.write(averages, average_nodes)
 	
 	def write(self, ave, node_ave):
 		"""outputs averages"""
-		w = csv.writer(open("output/correct_averages_%s" % (self.file_name), 'wb'), dialect='excel')
+		file_name = "output/correct_averages_%s" % (self.file_name)
+		if self.prune:
+			file_name = "output/pruned_correct_averages_%s" % (self.file_name)
+		w = csv.writer(open(file_name, 'wb'), dialect='excel')
 		for k in sorted(ave.keys()):
 			w.writerow([k, ave[k]])
 		
-		w = csv.writer(open("output/node_averages_%s" % (self.file_name), 'wb'), dialect='excel')
+		file_name = "output/node_averages_%s" % (self.file_name)
+		if self.prune:
+			file_name = "output/pruned_node_averages_%s" % (self.file_name)
+		w = csv.writer(open(file_name, 'wb'), dialect='excel')
 		for k in sorted(node_ave.keys()):
 			w.writerow([k, node_ave[k]])
 					

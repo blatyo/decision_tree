@@ -1,17 +1,15 @@
 import math
+import chi
 
 class Builder:
-	def build(self, examples):
-		"""builds the tree"""
-		
-		"""attribute names are simply the index of the attribute in the examples"""
-		i, attributes = 0, []
-		for col in examples[0][0:-1]:
-			attributes.append(i)
-			i += 1
-		return self.learn(examples, attributes, examples)
+	def __init__(self):
+		self.chi = chi.Chi()
 	
-	def learn(self, examples, attributes, parent_examples):
+	def build(self, examples, attrs, prune=False):
+		"""builds the tree"""
+		return self.learn(examples, attrs.keys(), examples, attrs, prune)
+	
+	def learn(self, examples, attributes, parent_examples, attr_values, prune):
 		"""decision tree algorithm"""
 		if len(examples) == 0:
 			return Leaf(self.plurality(parent_examples))
@@ -25,8 +23,17 @@ class Builder:
 			sub_attributes.remove(best)
 			tree = Node(best)
 			partitions = self.partition(examples, best)
+			values = attr_values[best][:]
 			for key, sub_examples in partitions.iteritems():
-				tree.add_child(key, self.learn(sub_examples, sub_attributes, examples))
+				tree.add_child(key, self.learn(sub_examples, sub_attributes, examples, attr_values, prune))
+				if key in values:
+					values.remove(key)
+			for value in values:
+				tree.add_child(value, Leaf(self.plurality(examples)))
+			
+			if prune and tree.all_children_leaves():
+				if not self.chi.significant(partitions, examples):
+					tree = Leaf(self.plurality(examples))
 			return tree
 	
 	def partition(self, examples, best):
@@ -124,12 +131,8 @@ class Node:
 		return self.select_child(example).choose(example)
 	
 	def select_child(self, example):
-		if self.children.get(example[self.attribute]):
-			return self.children[example[self.attribute]]
-		else:
-			"""if we have never seen the attribute, the tree doesn't know how to handle it."""
-			"""we generate a junk value so that it will be considered a miss."""
-			return Leaf('')
+		return self.children[example[self.attribute]]
+		
 		
 	def number_of_nodes(self):
 		"""the number of nodes in the children trees plus this node"""
@@ -144,7 +147,16 @@ class Node:
 		for k, v in self.children.iteritems():
 			s = "%s%s%s: %s" % (s, "  " * depth, k, v.to_s(depth + 1))
 		return s
-
+	
+	def all_children_leaves(self):
+		for kid in self.children.values():
+			if not kid.leaf():
+				return False
+		return True
+	
+	def leaf(self):
+		return False
+		
 class Leaf:
 	def __init__(self, choice):
 		"""represents a class label choice"""
@@ -161,3 +173,6 @@ class Leaf:
 	def to_s(self, depth):
 		"""visualizes the leaf"""
 		return "%s\n" % (self.choice)
+	
+	def leaf(self):
+		return True
