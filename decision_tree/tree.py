@@ -131,6 +131,7 @@ class Node:
 		return self.select_child(example).choose(example)
 	
 	def select_child(self, example):
+		"""gets child based on attribute of this node"""
 		return self.children[example[self.attribute]]
 		
 		
@@ -149,12 +150,14 @@ class Node:
 		return s
 	
 	def all_children_leaves(self):
+		"""Checks if all the children are leaves."""
 		for kid in self.children.values():
 			if not kid.leaf():
 				return False
 		return True
 	
 	def leaf(self):
+		"""Not a leaf"""
 		return False
 		
 class Leaf:
@@ -175,4 +178,5 @@ class Leaf:
 		return "%s\n" % (self.choice)
 	
 	def leaf(self):
+		"""A leaf!!!!!!!!11111"""
 		return True

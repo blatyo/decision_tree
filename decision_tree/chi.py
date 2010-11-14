@@ -2,6 +2,7 @@ import math
 
 class Chi:
 	def __init__(self):
+		"""values from http://www.uwsp.edu/psych/stat/x2.htm"""
 		self.values = {
 			1:		3.84,
 			2:		5.99,
@@ -45,6 +46,7 @@ class Chi:
 		}
 	
 	def significant(self, partitions, examples):
+		"""Calculates the distribution and compares it against the chi squared distribution"""
 		(p, n) = self.split(examples)
 		
 		D = 0
@@ -58,6 +60,7 @@ class Chi:
 		return D >= self.value(df)
 		
 	def split(self, examples):
+		"""counts positives and negatives"""
 		p_label = examples[0][-1]
 		p, n = 0, 0
 		for example in examples:
@@ -68,6 +71,7 @@ class Chi:
 		return (p, n)
 	
 	def value(self, df):
+		"""return the chi squared distribution for the degrees of freedom, approximate if necessary"""
 		if self.values.get(df):
 			return self.values[df]
 		

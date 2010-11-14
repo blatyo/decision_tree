@@ -16,6 +16,7 @@ class Samples:
 					self.attrs[i] = [row[i]]
 				
 	def attributes(self):
+		"""attributes linked to their values"""
 		return self.attrs
 	
 	def random_split(self):

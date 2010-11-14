@@ -5,13 +5,17 @@ You can run this program by doing:
 
     python decision_tree.py <dataset>
 
+If you want to do it with pruning run (Dataset should only have two classes):
+
+    python decision_tree.py <dataset> prune
+
 For example:
 
     python decision_tree.py data/car.csv
 
 Or:
 
-    python decision_tree.py data/tic-tac-toe.csv
+    python decision_tree.py data/tic-tac-toe.csv prune
 
 ## Problem Description
 Implement the decision tree induction algorithm described in the course textbook (Section 18.3, pp. 697-707). Then produce a plot similar to the one in Figure 18.7 (page 703). Compute 10 different random orders for your training set. Then, compute the accuracy rate (correct recognition percentage) of the induced decision tree on the test set when the learning algorithm is run for 1 sample, 5 samples, 10 samples, .., up to N samples (where N is the number of training samples), for each of the 10 orderings of your training set. The values plotted in the graph should be the average of the accuracy rates observed for k-samples (k=1,5,10,...,n) over the 10 different orderings.
